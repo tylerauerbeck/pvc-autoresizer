@@ -2,15 +2,15 @@
 TEST_KUBERNETES_TARGET ?= current
 
 ifeq ($(TEST_KUBERNETES_TARGET),current)
-KUBERNETES_VERSION := 1.22.4
+KUBERNETES_VERSION := 1.23.3
 else ifeq ($(TEST_KUBERNETES_TARGET),prev)
-KUBERNETES_VERSION := 1.21.2
+KUBERNETES_VERSION := 1.22.4
 else ifeq ($(TEST_KUBERNETES_TARGET),prev2)
-KUBERNETES_VERSION := 1.20.7
+KUBERNETES_VERSION := 1.21.2
 endif
 export KUBERNETES_VERSION
 
-KUBE_PROMETHEUS_VERSION := 0.9.0
+KUBE_PROMETHEUS_VERSION := 0.10.0
 TOPOLVM_VERSION := 0.10.3
 KIND_NODE_IMAGE=kindest/node:v$(KUBERNETES_VERSION)
 KIND_CLUSTER_NAME := autoresizer-e2e
@@ -36,7 +36,8 @@ setup:
 .PHONY: init-cluster
 init-cluster: launch-kind autoresizer.img kube-prometheus
 	# https://github.com/prometheus-operator/kube-prometheus/tree/v$(KUBE_PROMETHEUS_VERSION)#quickstart"
-	$(KUBECTL) apply -f kube-prometheus/manifests/setup
+	# add options to avoid applying error (https://github.com/prometheus-community/helm-charts/issues/1500#issuecomment-969149744)
+	$(KUBECTL) apply -f kube-prometheus/manifests/setup --force-conflicts=true --server-side
 	until $(KUBECTL) get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	$(KUBECTL) apply -f kube-prometheus/manifests/
 	# setup autoresizer
@@ -88,7 +89,6 @@ kube-prometheus:
 .PHONY: clean
 clean: stop-lvmd
 	rm -rf \
-		$(BINDIR) \
 		$(TMPDIR) \
 		autoresizer.img \
 		kube-prometheus
