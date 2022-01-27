@@ -68,7 +68,7 @@ test: manifests generate tools fmt vet ## Run tests.
 	test -z "$$($(shell go env GOPATH)/bin/nilerr ./... 2>&1 | tee /dev/stderr)"
 	go install ./...
 	source <($(SETUP_ENVTEST) use -p env $(ENVTEST_K8S_VERSION)); \
-		go test -race -v -count 1 ./...
+		go test -race -v -count 1 ./... --timeout=60s
 
 ##@ Build
 

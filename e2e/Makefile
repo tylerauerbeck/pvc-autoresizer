@@ -15,7 +15,7 @@ TOPOLVM_VERSION := 0.10.3
 KIND_NODE_IMAGE=kindest/node:v$(KUBERNETES_VERSION)
 KIND_CLUSTER_NAME := autoresizer-e2e
 
-GINKGO_VERSION := $(shell awk '/github.com\/onsi\/ginkgo/ {print substr($$2, 2)}' ../go.mod)
+GINKGO_VERSION := $(shell awk '/github.com\/onsi\/ginkgo\/v2/ {print substr($$2, 2)}' ../go.mod)
 
 SUDO := sudo
 BINDIR := $(shell pwd)/../bin
@@ -31,7 +31,7 @@ setup:
 	mkdir -p $(BINDIR)
 	curl -o $(BINDIR)/kubectl -sfL https://storage.googleapis.com/kubernetes-release/release/v$(KUBERNETES_VERSION)/bin/linux/amd64/kubectl
 	chmod a+x $(BINDIR)/kubectl
-	GOBIN=$(BINDIR) go install github.com/onsi/ginkgo/ginkgo@v$(GINKGO_VERSION)
+	GOBIN=$(BINDIR) go install github.com/onsi/ginkgo/v2/ginkgo@v$(GINKGO_VERSION)
 
 .PHONY: init-cluster
 init-cluster: launch-kind autoresizer.img kube-prometheus
